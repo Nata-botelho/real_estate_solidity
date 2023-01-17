@@ -16,12 +16,12 @@ contract land_token
     }
 
     // Mapeamento do endereço do investidor para seu patrimônio em terrenos (land tokens)
-    mapping(address => uint) owned_lands_quantity;
+    mapping(address => uint) owned_lands_length;
     mapping(address => Land[]) owned_lands;
 
     address public owner;
 
-    function MyLandContract() public returns (address)
+    function land_token() public returns (address)
     {
         owner = msg.sender;
         return owner;
@@ -39,28 +39,27 @@ contract land_token
             }
         );
         owned_lands[_owner].push(new_land);
-        owned_lands_quantity[_owner]++;
+        owned_lands_length[_owner]++;
         total_land_tokens++;
     }
 
     // Transferir terreno do owner para land_buyer
     function transfer_land(address land_buyer, uint _landID) public returns (bool _result){
-        require (owned_lands_quantity[owner] > 0, "Não possui terrenos para transferir");
+        require (owned_lands_length[owner] > 0, "Não possui terrenos para transferir");
 
-        for(uint i=0; i < (owned_lands[owner].length); i++)    
+        for(uint i=0; i < owned_lands_length[owner]; i++)    
         {
             if (owned_lands[owner][i].landID == _landID){
                 owned_lands[owner][i].ownerAddress = land_buyer;
                 owned_lands[land_buyer].push(owned_lands[owner][i]);
-                owned_lands_quantity[land_buyer]++;
+                owned_lands_length[land_buyer]++;
 
-                if (i < owned_lands_quantity[owner]){
-                    owned_lands[owner][i] = owned_lands[owner][owned_lands_quantity[owner]-1];
+                if (i < owned_lands_length[owner]){
+                    owned_lands[owner][i] = owned_lands[owner][owned_lands_length[owner]-1];
                 }
 
                 owned_lands[owner].pop();
-                owned_lands_quantity[owner]--;
-
+                owned_lands_length[owner]--;
                 total_land_bought++;
 
                 return true;
@@ -71,11 +70,11 @@ contract land_token
     }
 
     function get_my_lands_quantity() public view returns (uint){
-        return owned_lands_quantity[owner];
+        return owned_lands_length[owner];
     }
 
     function get_land_by_index(uint index) public view returns (string memory, uint){
-        require (owned_lands_quantity[owner] > 0, "Não possui terrenos para visualizar");
+        require (owned_lands_length[owner] > 0, "Não possui terrenos para visualizar");
 
         return (owned_lands[owner][index].location, owned_lands[owner][index].landID);
     }
